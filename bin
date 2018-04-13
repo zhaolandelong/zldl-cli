@@ -1,0 +1,97 @@
+#! /usr/bin/env node
+const program = require('commander')
+const inquirer = require('inquirer')
+const chalk = require('chalk')
+const exec = require('child_process').exec
+const tpls = require('./templates')
+
+program
+  .command('init')
+  .description('初始化项目')
+  .option('--name [projectName]')
+  .option('--sass', '启用sass')
+  .option('--less', '启用less')
+  .action(option => {
+    const config = Object.assign({
+      name: null,
+      sass: false,
+      less: false
+    }, option)
+    const promps = []
+    if (!config.name) {
+      promps.push({
+        type: 'input',
+        name: 'name',
+        message: 'Project name:',
+        validate: function (input) {
+          if (!input) {
+            return '不能为空'
+          }
+          return true
+        }
+      })
+    }
+    if (!config.eslint) {
+      promps.push({
+        type: 'list',
+        name: 'eslint',
+        message: 'Use eslint:',
+        choices: [
+          {
+            name: 'Yes',
+            value: true
+          },
+          {
+            name: 'no',
+            value: false
+          }
+        ]
+      })
+    }
+    if (!config.sass && !config.less) {
+      promps.push({
+        type: 'list',
+        name: 'style',
+        message: 'Use css-preloader:',
+        choices: [
+          {
+            name: 'Sass/Compass',
+            value: 'sass'
+          },
+          {
+            name: 'Less',
+            value: 'less'
+          },
+          {
+            name: 'none',
+            value: null
+          }
+        ]
+      })
+    }
+    inquirer.prompt(promps).then(function (answers) {
+      console.log(answers)
+      const { url, branch } = tpls.webpack;
+      // git命令，远程拉取项目并自定义项目名  
+      let cmdStr = `git clone ${url} ${answers.name} && cd ${answers.name} && git checkout ${branch}`
+
+      console.log(chalk.white('\n Start generating...'))
+
+      exec(cmdStr, (error, stdout, stderr) => {
+        if (error) {
+          console.log(error)
+          process.exit()
+        }
+        console.log(chalk.green('\n √ Generation completed!'))
+        console.log(chalk.green(`\n cd ${answers.name} && npm install \n`))
+        process.exit()
+      })
+    })
+  })
+  .on('--help', function () {
+    console.log('  Examples:')
+    console.log('')
+    console.log('$ app module moduleName')
+    console.log('$ app m moduleName')
+  })
+program.parse(process.argv)
