@@ -9,13 +9,11 @@ program
   .command('init')
   .description('初始化项目')
   .option('--name [projectName]')
-  .option('--sass', '启用sass')
-  .option('--less', '启用less')
+  .option('--eslint', '启用eslint-loader')
   .action(option => {
     const config = Object.assign({
       name: null,
-      sass: false,
-      less: false
+      eslint: false
     }, option)
     const promps = []
     if (!config.name) {
@@ -35,43 +33,28 @@ program
       promps.push({
         type: 'list',
         name: 'eslint',
-        message: 'Use eslint:',
+        message: 'Use eslint-loader to check js/jsx:',
         choices: [
-          {
-            name: 'Yes',
-            value: true
-          },
           {
             name: 'no',
             value: false
-          }
-        ]
-      })
-    }
-    if (!config.sass && !config.less) {
-      promps.push({
-        type: 'list',
-        name: 'style',
-        message: 'Use css-preloader:',
-        choices: [
-          {
-            name: 'Sass/Compass',
-            value: 'sass'
           },
           {
-            name: 'Less',
-            value: 'less'
-          },
-          {
-            name: 'none',
-            value: null
+            name: 'Yes',
+            value: true
           }
         ]
       })
     }
     inquirer.prompt(promps).then(function (answers) {
       console.log(answers)
-      const { url, branch } = tpls.webpack;
+      let tplName;
+      if (answers.eslint) {
+        tplName = 'react-eslint-loader';
+      } else {
+        tplName = 'react';
+      }
+      const { url, branch } = tpls[tplName];
       // git命令，远程拉取项目并自定义项目名  
       let cmdStr = `git clone ${url} ${answers.name} && cd ${answers.name} && git checkout ${branch}`
 

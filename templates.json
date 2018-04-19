@@ -2,5 +2,13 @@
   "webpack": {
     "url": "https://github.com/zhaolandelong/base-tpl.git",
     "branch": "webpack"
+  },
+  "react-eslint-loader": {
+    "url": "https://github.com/zhaolandelong/base-tpl.git",
+    "branch": "react-eslint-loader"
+  },
+  "react": {
+    "url": "https://github.com/zhaolandelong/base-tpl.git",
+    "branch": "react"
   }
 }
